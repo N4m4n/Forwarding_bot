@@ -23,17 +23,22 @@ async def forwarder(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
     if not message or not source:
         return
 
+    report = ''
     for chat in get_destenation(message.chat_id, message.message_thread_id):
         try:
+            print(chat)
             await send_message(message, chat["chat_id"], thread_id=chat["thread_id"])
+            report += f"Forwarded message to {chat['chat_id']} : Success\n\n"
         except ChatMigrated as err:
             await send_message(message, err.new_chat_id)
             LOGGER.warning(
                 f"Chat {chat} has been migrated to {err.new_chat_id}!! Edit the config file!!"
             )
+            report += f"Chat {chat} has been migrated to {err.new_chat_id}!! Edit the config file!!\n\n"
         except Exception as err:
             LOGGER.warning(f"Failed to forward message from {source.id} to {chat} due to {err}")
-
+            report += f"Forwarded message to {chat['chat_id']} : Failed. \nReason : {err}\n\n"
+    await message.reply_text(report)
 
 FORWARD_HANDLER = MessageHandler(
     filters.Chat([source["chat_id"] for source in get_source()])
