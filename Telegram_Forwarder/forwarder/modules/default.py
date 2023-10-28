@@ -48,5 +48,25 @@ async def help(update: Update, _):
         await message.reply_text(PM_HELP_TEXT)
 
 
+async def add_group_id(update: Update, _):
+    chat = update.effective_chat
+    message = update.effective_message
+
+    chat_id = message.chat.id
+    chat_name = message.chat.title
+    print(chat_name)
+    print(chat_id)
+    print(chat)
+    f = open(chat_name + ".txt", "w")
+    f.write(str(chat_id))
+    f.close()
+    
+    print(message)
+    if not (chat and message):
+        return
+
+
+
 bot.add_handler(CommandHandler("start", start, filters=filters.User(OWNER_ID)))
 bot.add_handler(CommandHandler("help", help, filters=filters.User(OWNER_ID)))
+bot.add_handler(CommandHandler("addgroup", add_group_id))
