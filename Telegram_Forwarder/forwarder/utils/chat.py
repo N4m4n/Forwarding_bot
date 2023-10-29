@@ -1,6 +1,6 @@
 from typing import List, List, Union, TypedDict, Optional
 
-from forwarder import CONFIG
+
 
 
 class ChatConfig(TypedDict):
@@ -19,6 +19,7 @@ def parse_topic(chat_id: Union[str, int]) -> ChatConfig:
 
 
 def get_source() -> List[ChatConfig]:
+    from forwarder import CONFIG
     return [parse_topic(chat["source"]) for chat in CONFIG]
 
 
@@ -30,6 +31,7 @@ def get_destenation(chat_id: int, topic_id: Optional[int] = None) -> List[ChatCo
         topic_id (`Optional[int]`): source topic id. Defaults to None.
     """
 
+    from forwarder import CONFIG
     dest: List[ChatConfig] = []
 
     for chat in CONFIG:

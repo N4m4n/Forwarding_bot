@@ -1,8 +1,9 @@
 from telegram import Update
-from telegram.ext import ContextTypes, CommandHandler, filters
+from telegram.ext import ContextTypes, CommandHandler, filters,MessageHandler
 from telegram.constants import ParseMode
-
-from forwarder import bot, OWNER_ID
+import json
+from forwarder import bot
+import forwarder
 
 PM_START_TEXT = """
 Hey {}, I'm {}!
@@ -48,25 +49,30 @@ async def help(update: Update, _):
         await message.reply_text(PM_HELP_TEXT)
 
 
-async def add_group_id(update: Update, _):
+
+async def new_chat_members(update: Update, context):
     chat = update.effective_chat
     message = update.effective_message
 
-    chat_id = message.chat.id
-    chat_name = message.chat.title
-    print(chat_name)
-    print(chat_id)
-    print(chat)
-    f = open(chat_name + ".txt", "w")
-    f.write(str(chat_id))
-    f.close()
-    
-    print(message)
     if not (chat and message):
         return
 
+    # new_members = message.new_chat_members
+    # print(new_members)
+    # print(message)
+    # print(chat)
+    
+    print(chat.id)
+    data = []
+    with open('chat_list.json', 'r') as f:
+        data = json.load(f)
+    data[0]['destination'].append(chat.id)
+    bot.send_message(chat_id=data[0]['source'], text='Hello from ChatGPT!')
+    forwarder.CONFIG = data
+    with open('chat_list.json', 'w') as f:
+        json.dump(data, f)
+    
 
-
-bot.add_handler(CommandHandler("start", start, filters=filters.User(OWNER_ID)))
-bot.add_handler(CommandHandler("help", help, filters=filters.User(OWNER_ID)))
-bot.add_handler(CommandHandler("addgroup", add_group_id))
+bot.add_handler(CommandHandler("start", start))
+bot.add_handler(CommandHandler("help", help))
+bot.add_handler(MessageHandler(filters.StatusUpdate.NEW_CHAT_MEMBERS, new_chat_members))

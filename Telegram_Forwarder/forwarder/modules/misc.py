@@ -37,7 +37,7 @@ async def get_id(update: Update, _):
 
 
 GET_ID_HANDLER = MessageHandler(
-    filters.COMMAND & filters.Regex(r"^/id") & (filters.User(OWNER_ID) | filters.ChatType.CHANNEL),
+    filters.COMMAND & filters.Regex(r"^/id"),
     get_id,
 )
 
