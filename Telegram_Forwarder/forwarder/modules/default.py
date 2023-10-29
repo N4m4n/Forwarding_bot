@@ -53,6 +53,8 @@ async def help(update: Update, _):
 async def new_chat_members(update: Update, context):
     chat = update.effective_chat
     message = update.effective_message
+    # bot.bot.sendMessage(chat_id=data[0]['source'], text='Hello from ChatGPT!')
+
 
     if not (chat and message):
         return
@@ -66,12 +68,17 @@ async def new_chat_members(update: Update, context):
     data = []
     with open('chat_list.json', 'r') as f:
         data = json.load(f)
+    
+    if(chat.id in data[0]['destination']):
+        print("Chat id already present")
+        return
+    
     data[0]['destination'].append(chat.id)
-    bot.send_message(chat_id=data[0]['source'], text='Hello from ChatGPT!')
     forwarder.CONFIG = data
     with open('chat_list.json', 'w') as f:
         json.dump(data, f)
     
+    await bot.bot.sendMessage(chat_id=data[0]['source'], text='Bot was added to '+chat.title+'! Chat id: '+str(chat.id))
 
 bot.add_handler(CommandHandler("start", start))
 bot.add_handler(CommandHandler("help", help))
